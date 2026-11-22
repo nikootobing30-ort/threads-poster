@@ -2,8 +2,9 @@ name: Posting Threads
 
 on:
   schedule:
-    # Waktu UTC: 00:05, 05:05, 12:05 = 07:05, 12:05, 19:05 WIB
-    - cron: "5 0,5,12 * * *"
+    # Tiap jam di menit ke-7 (GitHub kadang telat/melewatkan jadwal; jam berikutnya menyusul).
+    # poster.py hanya memposting yang sudah jatuh tempo, jadi jam posting tetap 07.00/12.00/19.00 WIB.
+    - cron: "7 * * * *"
   workflow_dispatch:
 
 permissions:
