@@ -2,8 +2,9 @@ name: Perpanjang token Threads
 
 on:
   schedule:
-    # Setiap Senin 08:00 WIB. Token berlaku 60 hari; diperpanjang tiap minggu.
-    - cron: "0 1 * * 1"
+    # Setiap Rabu 08:00 WIB. Token berlaku 60 hari; diperpanjang tiap minggu.
+    # (Meta hanya mau memperpanjang token yang umurnya >= 24 jam.)
+    - cron: "0 1 * * 3"
   workflow_dispatch:
 
 jobs:

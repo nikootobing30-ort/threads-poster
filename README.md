@@ -13,7 +13,7 @@ GitHub Actions — laptop boleh mati. Gratis (Threads API tidak berbayar).
 | `antrean/queue.json` | Antrean + status tiap postingan (`pending`, `posted`, `skipped`, `failed`) |
 | `images/` | Gambar kartu (harus publik agar bisa diambil Threads) |
 | `.github/workflows/posting.yml` | Jadwal posting |
-| `.github/workflows/perpanjang-token.yml` | Perpanjang token tiap Senin |
+| `.github/workflows/perpanjang-token.yml` | Perpanjang token tiap Rabu |
 
 ## Penyiapan (sekali)
 
