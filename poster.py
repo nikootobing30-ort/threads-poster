@@ -59,13 +59,23 @@ def wait_ready(container_id):
     raise RuntimeError("container tidak siap setelah 60 detik")
 
 
-def publish(text, image_url=None, reply_to=None):
+def publish(text, image_url=None, reply_to=None, topic=None):
     params = {"text": text, "media_type": "IMAGE" if image_url else "TEXT"}
     if image_url:
         params["image_url"] = image_url
     if reply_to:
         params["reply_to_id"] = reply_to
-    container = call("POST", "me/threads", params)["id"]
+    if topic:
+        params["topic_tag"] = topic
+    try:
+        container = call("POST", "me/threads", params)["id"]
+    except RuntimeError as e:
+        if not topic:
+            raise
+        # Jika topik ditolak, posting tetap jalan tanpa topik.
+        print(f"  topik '{topic}' ditolak, ulang tanpa topik: {str(e)[:150]}", file=sys.stderr)
+        params.pop("topic_tag")
+        container = call("POST", "me/threads", params)["id"]
     wait_ready(container)
     return call("POST", "me/threads_publish", {"creation_id": container})["id"]
 
@@ -86,7 +96,7 @@ def save(queue):
 def main():
     if not DRY and not os.getenv("THREADS_TOKEN"):
         sys.exit("THREADS_TOKEN tidak ada. Simpan token di GitHub Secrets dengan nama THREADS_TOKEN.")
-    queue = json.loads(QUEUE.read_text(encoding="utf-8"))
+    queue = json.loads(QUEUE.read_text(encoding="utf-8-sig"))
     now = dt.datetime.now(WIB)
     posted, errors = 0, 0
 
@@ -106,6 +116,8 @@ def main():
         label = f"[{item['id']}] {item['scheduled_at']}"
         if DRY:
             print(f"DRY {label}\n  teks ({len(item['text'])}): {item['text'][:120]}…")
+            if item.get("topic"):
+                print(f"  topik: {item['topic']}")
             if item.get("image"):
                 print(f"  gambar: {image_url_for(item) if os.getenv('IMAGE_BASE_URL') else item['image']}")
             if item.get("reply_text"):
@@ -115,7 +127,7 @@ def main():
 
         try:
             if not item.get("post_id"):
-                item["post_id"] = publish(item["text"], image_url_for(item))
+                item["post_id"] = publish(item["text"], image_url_for(item), topic=item.get("topic"))
                 print(f"OK  {label} -> post {item['post_id']}")
             if item.get("reply_text") and not item.get("reply_id"):
                 time.sleep(5)
