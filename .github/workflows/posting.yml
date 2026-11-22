@@ -1,0 +1,38 @@
+name: Posting Threads
+
+on:
+  schedule:
+    # Waktu UTC: 00:05, 05:05, 12:05 = 07:05, 12:05, 19:05 WIB
+    - cron: "5 0,5,12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: posting-threads
+  cancel-in-progress: false
+
+jobs:
+  posting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Posting antrean yang sudah jatuh tempo
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+          IMAGE_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/
+        run: python poster.py
+
+      - name: Simpan status antrean
+        if: always()
+        run: |
+          git config user.name "dapurhemat-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add antrean/queue.json
+          git diff --cached --quiet || (git commit -m "status posting $(date -u +%F_%H%M)" && git push)

@@ -1,0 +1,31 @@
+name: Perpanjang token Threads
+
+on:
+  schedule:
+    # Setiap Senin 08:00 WIB. Token berlaku 60 hari; diperpanjang tiap minggu.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+jobs:
+  perpanjang:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Perpanjang dan simpan token baru
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::Secret GH_PAT belum ada — token tidak bisa disimpan otomatis. Lihat README."
+            exit 0
+          fi
+          NEW="$(python refresh_token.py)"
+          echo "::add-mask::$NEW"
+          gh secret set THREADS_TOKEN --body "$NEW" --repo "${{ github.repository }}"
+          echo "Secret THREADS_TOKEN diperbarui."
