@@ -1,3 +1,12 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": "perkenalan",
+      "scheduled_at": "2026-11-22T14:07:00+07:00",
+      "type": "tanpa_link",
+      "text": "Halo! Akun ini khusus bagi-bagi racun barang dapur & rumah tangga yang murah tapi beneran kepake 🍳\n\nTiap hari ada rekomendasi baru, tips dapur, sama obrolan seputar urusan rumah.\n\nBarang dapur apa yang paling sering kalian beli ulang?",
+      "reply_text": null,
+      "status": "pending"
+    }
+  ]
 }
